@@ -1,1 +1,61 @@
-// TODO
+.container {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+.posts {
+  max-width: 720px;
+  margin: 2rem auto 0;
+
+  a {
+    display: block;
+
+    & + a {
+      margin-top: 3rem;
+    }
+  }
+
+  h2 {
+    font-size: 1.75rem;
+    font-weight: bold;
+  }
+
+  p {
+    font-size: 1.125rem;
+    font-weight: normal;
+    color: var(--gray-100);
+    padding-top: 8px;
+  }
+
+  .postCardFooter {
+    display: flex;
+    padding-top: 24px;
+  }
+
+  .postCardFooterContent {
+    font-size: 0.875rem;
+    color: var(--gray-300);
+
+    display: flex;
+    align-items: center;
+
+    svg {
+      font-size: 1.34rem;
+      stroke-width: 2;
+      margin-right: 8px;
+    }
+
+    & + .postCardFooterContent {
+      margin-left: 26px;
+    }
+  }
+}
+
+.morePosts {
+  color: var(--pink);
+  background: transparent;
+  border: none;
+  font: 600 1.125rem Inter, sans-serif;
+  margin-top: 4rem;
+}
