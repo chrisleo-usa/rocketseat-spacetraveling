@@ -1,4 +1,3 @@
-// TODO
 .bannerContainer {
   width: 100vw;
   max-width: 1440px;
@@ -74,5 +73,24 @@
         color: var(--pink);
       }
     }
+  }
+}
+
+.exitButton {
+  display: block;
+  text-align: center;
+  width: 100%;
+  margin: 2rem 0;
+  padding: 1rem 2rem;
+  color: var(--pink);
+  font-weight: bold;
+  border: 1px solid var(--pink);
+  border-radius: 8px;
+
+  transition: ease .4s;
+
+  &:hover {
+    background-color: var(--pink);
+    color: var(--gray-900);
   }
 }

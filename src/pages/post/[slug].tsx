@@ -12,6 +12,7 @@ import ptBR from 'date-fns/locale/pt-BR'
 
 import styles from './post.module.scss';
 import { useRouter } from 'next/router';
+import Link from 'next/link';
 
 interface Post {
   first_publication_date: string | null;
@@ -32,9 +33,10 @@ interface Post {
 
 interface PostProps {
   post: Post;
+  preview: any
 }
 
-export default function Post({ post }: PostProps) {
+export default function Post({ post, preview }: PostProps) {
   const router = useRouter()
 
   if (router.isFallback) {
@@ -43,29 +45,33 @@ export default function Post({ post }: PostProps) {
 
   return (
     <>
-      <div className={styles.bannerContainer}>
-        <img src={post.data.banner.url} alt='banner image'></img>
-      </div>
+      {post.data.banner && (
+        <div className={styles.bannerContainer}>
+          <img src={post.data.banner.url} alt='banner image'></img>
+        </div>
+      )}
 
       <main className={styles.container}>
-        <h1>{post.data.title}</h1>
+        <h1>{post.data?.title}</h1>
         <div className={styles.info}>
+          {post.first_publication_date && (
             <div className={styles.infoBlocks}>
               <FiCalendar />
-              <time>{format(parseISO(post.first_publication_date), 'dd MMM yyyy', { locale: ptBR })}</time>
+              <time>{format(parseISO(post?.first_publication_date), 'dd MMM yyyy', { locale: ptBR })}</time>
             </div>
-            <div className={styles.infoBlocks}>
-              <FiUser />
-              <span>{post.data.author}</span>
-            </div>
-            <div className={styles.infoBlocks}>
-              <FiClock />
-              <span>4 min</span>
-            </div>
+          )}
+          <div className={styles.infoBlocks}>
+            <FiUser />
+            <span>{post.data?.author}</span>
+          </div>
+          <div className={styles.infoBlocks}>
+            <FiClock />
+            <span>4 min</span>
+          </div>
         </div>
 
         <div className={styles.content}>
-          {post.data.content.map((content, index) => (
+          {post.data?.content.map((content, index) => (
             <div className={styles.contentBlock} key={index}>
               <h2 className={styles.contentHeading}>{content.heading}</h2>
               <div
@@ -76,6 +82,13 @@ export default function Post({ post }: PostProps) {
             </div>
           ))}
         </div>
+        {preview && (
+          <aside>
+            <Link href="/api/exit-preview">
+              <a className={styles.exitButton}>Sair do modo Preview</a>
+            </Link>
+          </aside>
+        )}
       </main>
     </>
   )
@@ -99,10 +112,11 @@ export const getStaticPaths: GetStaticPaths = async () => {
   }
 };
 
-export const getStaticProps: GetStaticProps = async ({ params }) => {
+export const getStaticProps: GetStaticProps = async ({ params, preview = false, previewData }) => {
   const { slug } = params
   const prismic = getPrismicClient();
-  const response = await prismic.getByUID('post', String(slug), {});
+  const response = await prismic.getByUID('post', String(slug), { ref: previewData?.ref ?? null });
+
 
   const post = {
     uid: response.uid,
@@ -117,10 +131,12 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
       content: response.data.content
     }
   }
+  console.log(post.uid)
 
   return {
     props: {
-      post
+      post,
+      preview
     },
     revalidate: 60 * 30
   }
