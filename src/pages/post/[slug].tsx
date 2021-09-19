@@ -1,21 +1,20 @@
 import React from 'react';
 import { GetStaticPaths, GetStaticProps } from 'next';
+import Link from 'next/link';
+import { useRouter } from 'next/router';
 import Prismic from '@prismicio/client'
-import Image from 'next/image'
-
 import { RichText } from 'prismic-dom';
-
-import { getPrismicClient } from '../../services/prismic';
-import { FiCalendar, FiUser, FiClock} from "react-icons/fi";
 import { format, parseISO } from 'date-fns'
 import ptBR from 'date-fns/locale/pt-BR'
+import { FiCalendar, FiUser, FiClock} from "react-icons/fi";
+
+import { getPrismicClient } from '../../services/prismic';
 
 import styles from './post.module.scss';
-import { useRouter } from 'next/router';
-import Link from 'next/link';
 
 interface Post {
   first_publication_date: string | null;
+  last_publication_date: string | null;
   data: {
     title: string;
     banner: {
@@ -57,7 +56,7 @@ export default function Post({ post, preview }: PostProps) {
           {post.first_publication_date && (
             <div className={styles.infoBlocks}>
               <FiCalendar />
-              <time>{format(parseISO(post?.first_publication_date), 'dd MMM yyyy', { locale: ptBR })}</time>
+              <time>{format(parseISO(post.first_publication_date), 'dd MMM yyyy', { locale: ptBR })}</time>
             </div>
           )}
           <div className={styles.infoBlocks}>
@@ -69,6 +68,14 @@ export default function Post({ post, preview }: PostProps) {
             <span>4 min</span>
           </div>
         </div>
+        {post.last_publication_date && (
+          <span className={styles.editInfo}>
+            <i>
+              * editado em
+              <time> {format(parseISO(post.last_publication_date), "dd MMM yyyy', às 'kk:mm ", { locale: ptBR })}</time>
+            </i>
+          </span>
+        )}
 
         <div className={styles.content}>
           {post.data?.content.map((content, index) => (
@@ -117,10 +124,10 @@ export const getStaticProps: GetStaticProps = async ({ params, preview = false, 
   const prismic = getPrismicClient();
   const response = await prismic.getByUID('post', String(slug), { ref: previewData?.ref ?? null });
 
-
   const post = {
     uid: response.uid,
     first_publication_date: response.first_publication_date,
+    last_publication_date: response.last_publication_date,
     data: {
       title: response.data.title,
       subtitle: response.data.subtitle,
@@ -131,7 +138,6 @@ export const getStaticProps: GetStaticProps = async ({ params, preview = false, 
       content: response.data.content
     }
   }
-  console.log(post.uid)
 
   return {
     props: {
